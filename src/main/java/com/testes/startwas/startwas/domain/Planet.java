@@ -1,7 +1,9 @@
 package com.testes.startwas.startwas.domain;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotEmpty;
 import org.apache.commons.lang3.builder.EqualsBuilder;
+
 
 @Entity
 @Table(name = "planets")
@@ -11,11 +13,16 @@ public class Planet {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @NotEmpty
+    @Column(nullable = false, unique = true)
     private String name;
 
-
+    @NotEmpty
+    @Column(nullable = false)
     private String climate;
 
+    @NotEmpty
+    @Column(nullable = false)
     private String terrain;
 
     public Planet() {
@@ -27,7 +34,7 @@ public class Planet {
         this.terrain = terrain;
     }
 
-    public Planet( String climate, String terrain) {
+    public Planet(String climate, String terrain) {
         this.climate = climate;
         this.terrain = terrain;
     }
