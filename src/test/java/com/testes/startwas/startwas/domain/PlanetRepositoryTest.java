@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.data.domain.Example;
 import org.springframework.test.context.jdbc.Sql;
 
@@ -105,6 +106,28 @@ public class PlanetRepositoryTest {
 
         assertTrue(response.isEmpty());
     }
+
+    @Test
+    public void removePlanet_WithExistingId_RemovePlanetFromDataBase() {
+        Planet planet = testEntityManager.persistFlushFind(PLANET);
+
+        planetRepository.deleteById(planet.getId());
+
+        Planet removedPlanet = testEntityManager.find(Planet.class, planet.getId());
+
+        assertNull(removedPlanet);
+
+    }
+
+    /**
+     * Nessa versão do spring, quando o repositorio tenta deletar um registro que não existe, não lança mais exceção, age como se o registro tivesse sido deletadow'
+     */
+   // @Test
+    public void removePlanet_WithUnexistingId_ThrowsException() {
+        assertThrows(EmptyResultDataAccessException.class, () -> planetRepository.deleteById(1L));
+    }
+
+
 }
 
 

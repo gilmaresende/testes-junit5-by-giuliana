@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -18,11 +19,14 @@ import java.util.Optional;
 import static com.testes.startwas.startwas.common.PlanetConstants.*;
 import static org.hamcrest.Matchers.hasSize;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
 
 @WebMvcTest(PlanetController.class)
 public class PlanetControllerTest {
@@ -127,5 +131,21 @@ public class PlanetControllerTest {
         mockMvc.perform(get("/planets").contentType(MediaType.APPLICATION_JSON)).
                 andExpect(status().isOk()).
                 andExpect(jsonPath("$", hasSize(0)));
+    }
+
+    @Test
+    public void removePlanet_WithExistingId_ReturnNoContent() throws Exception {
+        mockMvc.perform(delete("/planets/1").contentType(MediaType.APPLICATION_JSON)).
+                andExpect(status().isNoContent());
+    }
+
+    @Test
+    public void removePlanet_WithUnexistingId_ReturnNoFound() throws Exception {
+        final Long planetId = 1L;
+        doThrow(new EmptyResultDataAccessException(1)).when(planetService).remove(planetId);
+
+        mockMvc.perform(delete("/planets/" + planetId).contentType(MediaType.APPLICATION_JSON)).
+                andExpect(status().isNotFound());
+
     }
 }
