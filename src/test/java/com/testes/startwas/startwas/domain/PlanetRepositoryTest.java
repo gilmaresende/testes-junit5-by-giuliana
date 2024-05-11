@@ -1,6 +1,5 @@
 package com.testes.startwas.startwas.domain;
 
-import org.h2.table.Plan;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -81,7 +80,7 @@ public class PlanetRepositoryTest {
     }
 
     @Test
-    @Sql(scripts = "/import_planets.sql")
+    @Sql(scripts = "/sql/testes/import_planets.sql")
     public void listPlanets_RetuenFilteredPlanets() {
         Example<Planet> queryWithoutFilters = QueryBuilder.makeQuery(new Planet());
 
