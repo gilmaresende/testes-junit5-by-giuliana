@@ -1,5 +1,6 @@
 package com.testes.startwas.startwas.domain;
 
+import com.testes.startwas.startwas.jacoco.ExcludeFromJacocoGeneratedReport;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotEmpty;
 import org.apache.commons.lang3.builder.EqualsBuilder;
@@ -81,5 +82,16 @@ public class Planet {
     @Override
     public boolean equals(Object obj) {
         return EqualsBuilder.reflectionEquals(obj, this);
+    }
+
+    @ExcludeFromJacocoGeneratedReport
+    @Override
+    public String toString() {
+        return "Planet{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", climate='" + climate + '\'' +
+                ", terrain='" + terrain + '\'' +
+                '}';
     }
 }
