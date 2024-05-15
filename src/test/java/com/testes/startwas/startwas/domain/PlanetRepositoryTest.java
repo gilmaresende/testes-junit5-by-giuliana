@@ -2,6 +2,9 @@ package com.testes.startwas.startwas.domain;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
@@ -11,6 +14,7 @@ import org.springframework.test.context.jdbc.Sql;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 import static com.testes.startwas.startwas.common.PlanetConstants.PLANET;
 import static com.testes.startwas.startwas.common.PlanetConstants.TATOOINE;
@@ -44,14 +48,35 @@ public class PlanetRepositoryTest {
 
     }
 
-    @Test
-    public void createPlanet_WithInvalidData_ThrowsException() {
-        Planet emptyPlanet = new Planet();
+    @ParameterizedTest
+    @MethodSource("providesInvalidPlanet")
+    public void createPlanet_WithInvalidData_ThrowsException(Planet planet) {
+        assertThrows(RuntimeException.class, () -> planetRepository.save(planet));
+    }
 
-        Planet invalidPlanet = new Planet("", "", "");
-
-        assertThrows(RuntimeException.class, () -> planetRepository.save(emptyPlanet));
-        assertThrows(RuntimeException.class, () -> planetRepository.save(invalidPlanet));
+    private static Stream<Arguments> providesInvalidPlanet() {
+        return Stream.of(
+                Arguments.of(new Planet(null, null, null)),
+                Arguments.of(new Planet("", null, null)),
+                Arguments.of(new Planet(null, "", null)),
+                Arguments.of(new Planet(null, null, "")),
+                Arguments.of(new Planet("", "", null)),
+                Arguments.of(new Planet("", null, "")),
+                Arguments.of(new Planet(null, "", "")),
+                Arguments.of(new Planet("", "", "")),
+                Arguments.of(new Planet("nome", null, null)),
+                Arguments.of(new Planet(null, "climate", null)),
+                Arguments.of(new Planet(null, null, "terrain")),
+                Arguments.of(new Planet("nome", "", null)),
+                Arguments.of(new Planet("nome", null, "")),
+                Arguments.of(new Planet("", "climate", null)),
+                Arguments.of(new Planet(null, "climate", "")),
+                Arguments.of(new Planet("", "", "terrain")),
+                Arguments.of(new Planet("nome", "climate", null)),
+                Arguments.of(new Planet("nome", null, "terrain")),
+                Arguments.of(new Planet(null, "climate", "terrain")),
+                Arguments.of(new Planet("nome", "climate", ""))
+        );
     }
 
     @Test
@@ -121,7 +146,7 @@ public class PlanetRepositoryTest {
     /**
      * Nessa versão do spring, quando o repositorio tenta deletar um registro que não existe, não lança mais exceção, age como se o registro tivesse sido deletadow'
      */
-   // @Test
+    // @Test
     public void removePlanet_WithUnexistingId_ThrowsException() {
         assertThrows(EmptyResultDataAccessException.class, () -> planetRepository.deleteById(1L));
     }
